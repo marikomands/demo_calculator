@@ -7,10 +7,42 @@ const Calculator = () => {
     setDisplayValue(displayValue + value);
   };
 
+  const evaluateExpression = (expression) => {
+    const tokens = expression.split(/([+\-*/])/).filter(Boolean);
+    const stack = [];
+
+    const applyOperator = (operator, a, b) => {
+      switch (operator) {
+        case "+":
+          return a + b;
+        case "-":
+          return a - b;
+        case "*":
+          return a * b;
+        case "/":
+          return a / b;
+        default:
+          return 0;
+      }
+    };
+
+    tokens.forEach((token) => {
+      if (isNaN(token)) {
+        const b = parseFloat(stack.pop());
+        const a = parseFloat(stack.pop());
+        stack.push(applyOperator(token, a, b));
+      } else {
+        stack.push(token);
+      }
+    });
+
+    return stack[0];
+  };
+
   const handleEvaluate = () => {
     try {
-      const result = eval(displayValue);
-      setDisplayValue(result);
+      const result = evaluateExpression(displayValue);
+      setDisplayValue(result.toString());
     } catch (error) {
       setDisplayValue("Error");
     }
